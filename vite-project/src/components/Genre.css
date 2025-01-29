@@ -1,0 +1,54 @@
+.genre {
+    padding: 20px;
+    width: 1480px;
+
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.film-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+
+    scroll-snap-type: x mandatory;
+
+    position: relative;
+    width: 100%;
+
+    padding-bottom: 20px;
+}
+
+.film-container .film {
+    width: 170px;
+    height: 270px;
+    object-fit: cover;
+    scroll-snap-align: start;
+
+}
+
+.scroll-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.scroll-button.left {
+    left: 10px;
+
+}
+
+.scroll-button.right {
+    right: 10px;
+
+}
