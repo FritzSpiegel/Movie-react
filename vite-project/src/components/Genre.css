@@ -1,7 +1,8 @@
 .genre {
     padding: 20px;
-    width: 1480px;
-
+    width: 100%;
+    max-width: 1480px;
+    margin: 0 auto;
 }
 
 h2 {
@@ -9,25 +10,30 @@ h2 {
     margin-bottom: 20px;
 }
 
+.film-wrapper {
+    position: relative;
+}
+
 .film-container {
     display: flex;
     gap: 20px;
     overflow-x: auto;
-
     scroll-snap-type: x mandatory;
+    padding: 20px 0;
+    scroll-behavior: smooth;
+}
 
-    position: relative;
-    width: 100%;
-
-    padding-bottom: 20px;
+.film-container::-webkit-scrollbar {
+    display: none;
 }
 
 .film-container .film {
-    width: 170px;
+    flex: 0 0 calc((100% - 120px) / 7);
     height: 270px;
-    object-fit: cover;
     scroll-snap-align: start;
-
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .scroll-button {
@@ -41,14 +47,18 @@ h2 {
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .scroll-button.left {
     left: 10px;
-
 }
 
 .scroll-button.right {
     right: 10px;
-
 }

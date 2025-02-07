@@ -1,0 +1,70 @@
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.popup-content {
+    background: #222;
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 900px;
+    width: 90%;
+    text-align: left;
+    position: relative;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+}
+
+.popup-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.popup-left img {
+    width: 100%;
+    max-width: 280px;
+    border-radius: 8px;
+}
+
+.popup-right {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.popup-content h2 {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.popup-content p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 20px;
+}

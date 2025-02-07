@@ -16,14 +16,8 @@ const films = [
   { title: "2The Bouncer", image: "./assets/wolverine.jpg" },
   { title: "2Grenzgänger", image: "./assets/wolverine.jpg" },
   { title: "2Supergirl", image: "./assets/wolverine.jpg" },
-  { title: "2Furiosa", image: "./assets/wolverine.jpg" },
-  { title: "3Wolverine", image: "./assets/wolverine.jpg" },
-  { title: "3Take Cover", image: "./assets/wolverine.jpg" },
-  { title: "3The Dark Knight", image: "./assets/wolverine.jpg" },
-  { title: "3The Bouncer", image: "./assets/wolverine.jpg" },
-  { title: "3Grenzgänger", image: "./assets/wolverine.jpg" },
-  { title: "3Supergirl", image: "./assets/wolverine.jpg" },
-  { title: "3Furiosa", image: "./assets/wolverine.jpg" },
+  { title: "2Furiosa", image: "./assets/wolverine.jpg" }
+
 ];
 
 const App = () => {
