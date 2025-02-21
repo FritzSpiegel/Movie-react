@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from 'react-dom';
 import "./FilmPopup.css";
 
 const FilmPopup = ({ imdbID, onClose }) => {
@@ -12,8 +13,14 @@ const FilmPopup = ({ imdbID, onClose }) => {
 
     if (!film) return null;
 
-    return (
-        <div className="popup-overlay" onClick={onClose}>
+    const handleOverlayClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
+    return ReactDOM.createPortal(
+        <div className="popup-overlay" onClick={handleOverlayClick}>
             <div className="popup-content" onClick={(e) => e.stopPropagation()}>
                 <button className="close-btn" onClick={onClose}>X</button>
                 <div className="popup-left">
@@ -28,7 +35,8 @@ const FilmPopup = ({ imdbID, onClose }) => {
                     <p><strong>Country:</strong> {film.Country}</p>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

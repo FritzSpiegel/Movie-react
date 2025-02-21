@@ -1,7 +1,33 @@
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Neue Animations-Keyframes für das horizontale Scrollen */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 .film {
     position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
+    animation: fadeInScale 0.6s ease forwards;
+    animation-delay: calc(var(--animation-order) * 0.1s);
+    opacity: 0;
 }
 
 .film img {
@@ -59,4 +85,133 @@
     text-align: center;
     margin-top: 10px;
     font-size: 14px;
+}
+
+.film-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    border-radius: 0 0 8px 8px;
+    z-index: 3;
+}
+
+.film:hover .film-info {
+    transform: translateY(0);
+}
+
+.film-info h3 {
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+    color: white;
+}
+
+/* Anpassen des film-container */
+.film-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 20px 0;
+    scroll-behavior: smooth;
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 5%,
+        black 95%,
+        transparent
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        black 5%,
+        black 95%,
+        transparent
+    );
+}
+
+/* Anpassen der Film-Animation im horizontalen Scroll */
+.film-container .film {
+    flex: 0 0 calc((100% - 120px) / 7);
+    height: 270px;
+    scroll-snap-align: start;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: slideIn 0.6s ease forwards;
+    animation-delay: calc(var(--animation-order) * 0.1s);
+}
+
+/* Verbesserte Scroll-Buttons */
+.scroll-button {
+    background-color: rgba(229, 9, 20, 0.8);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.scroll-button:hover {
+    background-color: rgba(229, 9, 20, 1);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.scroll-button.left {
+    left: 20px;
+}
+
+.scroll-button.right {
+    right: 20px;
+}
+
+.film-wrapper:hover .scroll-button {
+    opacity: 1;
+}
+
+/* Verbesserte Loading-Animation */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    height: 270px;
+    color: #E50914;
+    font-size: 16px;
+    position: relative;
+}
+
+.loading-spinner::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(229, 9, 20, 0.3);
+    border-left-color: #E50914;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

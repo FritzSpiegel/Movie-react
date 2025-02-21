@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Film from "./Film";
 import "./Genre.css";
 import Search from "./Search";
+import { useInView } from 'react-intersection-observer';
 
 const genres = [
     "Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Romance", "Thriller", "Adventure"
@@ -13,6 +14,11 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
 
+    const { ref, inView } = useInView({
+        threshold: 0.5,
+        triggerOnce: false
+    });
+
     useEffect(() => {
         if (searchResults) {
             setFilms(searchResults);
@@ -20,6 +26,12 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
             fetchMoviesForGenre(genre, page);
         }
     }, [genre, page, searchResults]);
+
+    useEffect(() => {
+        if (inView && isSearch && onLoadMore) {
+            onLoadMore();
+        }
+    }, [inView, isSearch, onLoadMore]);
 
     const fetchMoviesForGenre = async (genre, currentPage) => {
         setLoading(true);
@@ -53,17 +65,27 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
 
     const scroll = (direction) => {
         if (containerRef.current && !isSearch) {
-            const scrollAmount = containerRef.current.clientWidth * 0.8;
-            const maxScroll = containerRef.current.scrollWidth - containerRef.current.clientWidth;
+            const container = containerRef.current;
+            const scrollAmount = container.clientWidth * 0.8;
+            const maxScroll = container.scrollWidth - container.clientWidth;
             
+            // Alle sichtbaren Filme neu animieren
+            const films = container.querySelectorAll('.film');
+            films.forEach((film, index) => {
+                film.style.animation = 'none';
+                film.offsetHeight; // Force reflow
+                film.style.animation = null;
+                film.style.setProperty('--animation-order', index);
+            });
+
             if (direction === 'right') {
-                const newScrollPosition = containerRef.current.scrollLeft + scrollAmount;
+                const newScrollPosition = container.scrollLeft + scrollAmount;
                 if (newScrollPosition >= maxScroll) {
                     setPage(prevPage => prevPage + 1);
                 }
-                containerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             } else {
-                containerRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
             }
         }
     };
@@ -73,15 +95,17 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
             <h2>{genre}</h2>
             {isSearch ? (
                 <div className="search-results-grid">
-                    {films.map((film) => (
+                    {films.map((film, index) => (
                         <Film 
                             key={film.imdbID} 
                             title={film.Title} 
                             image={film.Poster !== "N/A" ? film.Poster : null} 
-                            imdbID={film.imdbID} 
+                            imdbID={film.imdbID}
+                            index={index} 
                         />
                     ))}
                     {loading && <div className="loading-spinner">Loading...</div>}
+                    <div ref={ref} style={{ height: '20px', width: '100%' }} />
                 </div>
             ) : (
                 <div className="film-wrapper">
@@ -93,12 +117,13 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
                         ❮
                     </button>
                     <div className="film-container" ref={containerRef}>
-                        {films.map((film) => (
+                        {films.map((film, index) => (
                             <Film 
                                 key={film.imdbID} 
                                 title={film.Title} 
                                 image={film.Poster !== "N/A" ? film.Poster : null} 
-                                imdbID={film.imdbID} 
+                                imdbID={film.imdbID}
+                                index={index} 
                             />
                         ))}
                         {loading && <div className="loading-spinner">Loading...</div>}
@@ -128,7 +153,6 @@ const GenreList = () => {
         setLoading(true);
         const apiKey = "5206816f";
         try {
-            // Fetch 10 pages simultaneously for initial search (100 movies)
             const fetchPromises = [];
             const pagesToFetch = 10;
             
@@ -154,7 +178,6 @@ const GenreList = () => {
                     });
                 } else {
                     setSearchResults(allMovies);
-                    // Store total results count from first response
                     setTotalResults(parseInt(results[0].totalResults || 0));
                 }
             }
