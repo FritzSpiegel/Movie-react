@@ -1,0 +1,20 @@
+.logo {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 32px;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif;
+}
+
+.logo-highlight {
+    color: #E50914;
+} 

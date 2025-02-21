@@ -4,67 +4,109 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
 }
 
 .popup-content {
-    background: #222;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
     color: white;
-    padding: 25px;
-    border-radius: 12px;
-    max-width: 900px;
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 1000px;
     width: 90%;
-    text-align: left;
     position: relative;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     display: flex;
-    flex-direction: row;
-    gap: 25px;
+    gap: 30px;
+    animation: slideUp 0.3s ease;
 }
 
 .popup-left {
     flex: 1;
-    display: flex;
-    justify-content: center;
 }
 
 .popup-left img {
     width: 100%;
-    max-width: 280px;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .popup-right {
     flex: 2;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
 }
 
-.popup-content h2 {
-    font-size: 28px;
+.popup-right h2 {
+    font-size: 32px;
     font-weight: bold;
+    margin-bottom: 10px;
+    color: #E50914;
 }
 
-.popup-content p {
-    font-size: 18px;
-    margin: 5px 0;
+.popup-right p {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.popup-right strong {
+    color: #E50914;
 }
 
 .close-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: red;
+    top: 15px;
+    right: 15px;
+    background: #E50914;
     color: white;
     border: none;
-    padding: 8px 12px;
-    cursor: pointer;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    font-size: 20px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: #ff0f1f;
+    transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .popup-content {
+        flex-direction: column;
+        padding: 20px;
+    }
+    
+    .popup-left img {
+        max-width: 300px;
+        margin: 0 auto;
+    }
 }

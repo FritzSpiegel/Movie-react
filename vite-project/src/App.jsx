@@ -1,30 +1,34 @@
-import React from "react";
-import Genre from "./components/Genre";
-import "./components/Genre";
-
-const films = [
-  { title: "Wolverine", image: "./assets/wolverine.jpg" },
-  { title: "Take Cover", image: "./assets/wolverine.jpg" },
-  { title: "The Dark Knight", image: "./assets/wolverine.jpg" },
-  { title: "The Bouncer", image: "./assets/wolverine.jpg" },
-  { title: "Grenzgänger", image: "./assets/wolverine.jpg" },
-  { title: "Supergirl", image: "./assets/wolverine.jpg" },
-  { title: "Furiosa", image: "./assets/wolverine.jpg" },
-  { title: "2Wolverine", image: "./assets/wolverine.jpg" },
-  { title: "2Take Cover", image: "./assets/wolverine.jpg" },
-  { title: "2The Dark Knight", image: "./assets/wolverine.jpg" },
-  { title: "2The Bouncer", image: "./assets/wolverine.jpg" },
-  { title: "2Grenzgänger", image: "./assets/wolverine.jpg" },
-  { title: "2Supergirl", image: "./assets/wolverine.jpg" },
-  { title: "2Furiosa", image: "./assets/wolverine.jpg" }
-
-];
+import React, { useState } from "react";
+import GenreList from "./components/Genre";
+import Logo from "./components/Logo";
+import "./App.css";
 
 const App = () => {
+  const [resetKey, setResetKey] = useState(0);
+
+  const handleReset = () => {
+    setResetKey(prev => prev + 1);
+  };
+
   return (
-    <div className="app">
-      <Genre title="Genre 1" films={films} />
-      <Genre title="Genre 2" films={films} />
+    <div className="app" style={{
+      backgroundColor: "#141414",
+      minHeight: "100vh",
+      color: "white",
+      overflowX: "hidden"
+    }}>
+      <header className="app-header" style={{
+        padding: "20px 40px",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
+      }}>
+        <Logo onClick={handleReset} />
+      </header>
+      <main>
+        <GenreList key={resetKey} />
+      </main>
     </div>
   );
 };

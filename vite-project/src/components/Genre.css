@@ -53,6 +53,8 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .scroll-button.left {
@@ -61,4 +63,48 @@ h2 {
 
 .scroll-button.right {
     right: 10px;
+}
+
+.film-wrapper:hover .scroll-button {
+    opacity: 1;
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+    height: 270px;
+    color: #E50914;
+    font-size: 16px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Add these new styles for the search results grid */
+.search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1480px;
+    margin: 0 auto;
+}
+
+.search-results-grid .film {
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.search-results-grid .film:hover {
+    transform: scale(1.05);
+    z-index: 2;
 }
