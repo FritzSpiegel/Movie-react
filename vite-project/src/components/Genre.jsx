@@ -37,9 +37,9 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
         setLoading(true);
         const apiKey = "5206816f";
         try {
-            // Fetch 5 pages simultaneously for 50 movies per genre
+            // Reduziere die Anzahl der gleichzeitigen Anfragen von 5 auf 2
             const fetchPromises = [];
-            for (let page = currentPage; page < currentPage + 5; page++) {
+            for (let page = currentPage; page < currentPage + 2; page++) {
                 fetchPromises.push(
                     fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${genre}&type=movie&page=${page}`)
                         .then(response => response.json())
@@ -69,21 +69,25 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
             const scrollAmount = container.clientWidth * 0.8;
             const maxScroll = container.scrollWidth - container.clientWidth;
             
-            // Alle sichtbaren Filme neu animieren
+            // Optimiere die Animation der Filme
             const films = container.querySelectorAll('.film');
-            films.forEach((film, index) => {
-                film.style.animation = 'none';
-                film.offsetHeight; // Force reflow
-                film.style.animation = null;
-                film.style.setProperty('--animation-order', index);
+            requestAnimationFrame(() => {
+                films.forEach((film, index) => {
+                    film.style.animation = 'none';
+                    film.offsetHeight; // Force reflow
+                    film.style.animation = null;
+                    film.style.setProperty('--animation-order', index);
+                });
             });
 
             if (direction === 'right') {
                 const newScrollPosition = container.scrollLeft + scrollAmount;
-                if (newScrollPosition >= maxScroll) {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                
+                // Lade neue Filme nur wenn wir fast am Ende sind
+                if (newScrollPosition >= maxScroll - container.clientWidth) {
                     setPage(prevPage => prevPage + 1);
                 }
-                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             } else {
                 container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
             }

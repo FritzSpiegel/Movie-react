@@ -1,7 +1,7 @@
 .genre {
-    padding: 20px;
+    padding: 20px 40px;
     width: 100%;
-    max-width: 1480px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -37,6 +37,8 @@
     padding: 20px 0;
     scroll-behavior: smooth;
     position: relative;
+    -webkit-overflow-scrolling: touch;
+    will-change: transform;
 }
 
 .film-container::-webkit-scrollbar {
@@ -44,16 +46,18 @@
 }
 
 .film-container .film {
-    flex: 0 0 calc((100% - 120px) / 7);
-    height: 270px;
+    flex: 0 0 calc((100% - 140px) / 8);
+    height: 300px;
     scroll-snap-align: start;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease forwards;
+    animation-delay: calc(var(--animation-order) * 0.05s);
 }
 
 .scroll-button {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(229, 9, 20, 0.9);
     color: white;
     border: none;
     padding: 10px;
@@ -64,8 +68,8 @@
     transform: translateY(-50%);
     z-index: 2;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -74,11 +78,11 @@
 }
 
 .scroll-button.left {
-    left: 10px;
+    left: 20px;
 }
 
 .scroll-button.right {
-    right: 10px;
+    right: 20px;
 }
 
 .film-wrapper:hover .scroll-button {
@@ -102,14 +106,24 @@
     100% { opacity: 0.5; }
 }
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* Add these new styles for the search results grid */
 .search-results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    max-width: 1480px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+    padding: 20px 40px;
+    max-width: 100%;
 }
 
 .search-results-grid .film {
@@ -144,4 +158,44 @@
 .film-container::after {
     right: 0;
     background: linear-gradient(to left, #141414, transparent);
+}
+
+/* Verbesserte Responsive-Anpassungen */
+@media (max-width: 1600px) {
+    .film-container .film {
+        flex: 0 0 calc((100% - 120px) / 7);
+    }
+}
+
+@media (max-width: 1400px) {
+    .film-container .film {
+        flex: 0 0 calc((100% - 100px) / 6);
+    }
+}
+
+@media (max-width: 1200px) {
+    .film-container .film {
+        flex: 0 0 calc((100% - 80px) / 5);
+    }
+}
+
+@media (max-width: 992px) {
+    .film-container .film {
+        flex: 0 0 calc((100% - 60px) / 4);
+    }
+}
+
+@media (max-width: 768px) {
+    .film-container .film {
+        flex: 0 0 calc((100% - 40px) / 3);
+    }
+    .genre {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .film-container .film {
+        flex: 0 0 calc((100% - 20px) / 2);
+    }
 }
