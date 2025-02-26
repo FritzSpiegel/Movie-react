@@ -21,13 +21,14 @@
     }
 }
 
+/* Basis Film-Styles */
 .film {
     position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
-    animation: fadeInScale 0.6s ease forwards;
-    animation-delay: calc(var(--animation-order) * 0.1s);
-    opacity: 0;
+    transition: all 0.5s ease;
+    z-index: 1;
+    width: 170px;
+    height: 270px;
 }
 
 .film img {
@@ -38,7 +39,19 @@
     border-radius: 8px;
 }
 
-.film:hover {
+/* Film im Container */
+.film-container .film {
+    flex: 0 0 170px;
+    height: 270px;
+    scroll-snap-align: start;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease;
+}
+
+/* Entferne den normalen Hover-Effekt für Filme im Preview-Zustand */
+.film:not(.showing-preview):hover {
     transform: scale(1.1);
     z-index: 2;
 }
@@ -135,19 +148,6 @@
     );
 }
 
-/* Anpassen der Film-Animation im horizontalen Scroll */
-.film-container .film {
-    flex: 0 0 calc((100% - 120px) / 7);
-    height: 270px;
-    scroll-snap-align: start;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    opacity: 0;
-    animation: slideIn 0.6s ease forwards;
-    animation-delay: calc(var(--animation-order) * 0.1s);
-}
-
 /* Verbesserte Scroll-Buttons */
 .scroll-button {
     background-color: rgba(229, 9, 20, 0.8);
@@ -214,4 +214,118 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+.preview-iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.film:hover .preview-iframe {
+    transform: scale(1.1);
+}
+
+/* Preview-Zustand */
+.film.showing-preview {
+    flex: 0 0 480px !important;
+    width: 480px;
+    transform: scale(1.02);
+    z-index: 10;
+}
+
+.film.showing-preview .preview-container {
+    width: 100%;
+    height: 100%;
+}
+
+/* Container für Video/Bild */
+.preview-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    transition: all 0.5s ease;
+}
+
+/* Video Styles */
+.preview-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.showing-preview .preview-video {
+    opacity: 1;
+}
+
+.preview-gif {
+    object-fit: cover;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 14px;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards;
+    transition: all 0.3s ease;
+}
+
+.preview-loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(229, 9, 20, 0.3);
+    border-top: 3px solid #E50914;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.sound-hint {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    animation: fadeInOut 2s ease forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Neue Klassen für die Ausrichtung */
+.film.align-left {
+    transform-origin: left center;
+}
+
+.film.align-right {
+    transform-origin: right center;
 }

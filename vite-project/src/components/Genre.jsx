@@ -8,11 +8,13 @@ const genres = [
     "Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Romance", "Thriller", "Adventure"
 ];
 
-const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
+const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => {
     const containerRef = useRef(null);
     const [films, setFilms] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [showLeftButton, setShowLeftButton] = useState(false);
+    const [showRightButton, setShowRightButton] = useState(true);
 
     const { ref, inView } = useInView({
         threshold: 0.5,
@@ -32,6 +34,23 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
             onLoadMore();
         }
     }, [inView, isSearch, onLoadMore]);
+
+    const handleScroll = (e) => {
+        const container = e.target;
+        setShowLeftButton(container.scrollLeft > 0);
+        
+        // Prüfe, ob wir am Ende angekommen sind
+        const isAtEnd = Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth;
+        setShowRightButton(!isAtEnd);
+    };
+
+    useEffect(() => {
+        const container = containerRef.current;
+        if (container) {
+            container.addEventListener('scroll', handleScroll);
+            return () => container.removeEventListener('scroll', handleScroll);
+        }
+    }, []);
 
     const fetchMoviesForGenre = async (genre, currentPage) => {
         setLoading(true);
@@ -96,7 +115,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
 
     return (
         <div className="genre">
-            <h2>{genre}</h2>
+            <h2 onClick={() => onGenreClick && onGenreClick(genre)}>{genre}</h2>
             {isSearch ? (
                 <div className="search-results-grid">
                     {films.map((film, index) => (
@@ -116,11 +135,15 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
                     <button 
                         className="scroll-button left" 
                         onClick={() => scroll('left')}
-                        style={{ opacity: containerRef.current?.scrollLeft > 0 ? 1 : 0 }}
+                        style={{ opacity: showLeftButton ? 1 : 0 }}
                     >
                         ❮
                     </button>
-                    <div className="film-container" ref={containerRef}>
+                    <div 
+                        className="film-container" 
+                        ref={containerRef}
+                        onScroll={handleScroll}
+                    >
                         {films.map((film, index) => (
                             <Film 
                                 key={film.imdbID} 
@@ -135,6 +158,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch }) => {
                     <button 
                         className="scroll-button right" 
                         onClick={() => scroll('right')}
+                        style={{ opacity: showRightButton ? 1 : 0 }}
                     >
                         ❯
                     </button>
@@ -209,19 +233,30 @@ const GenreList = () => {
         }
     };
 
+    const handleGenreClick = (genre) => {
+        setSearchTerm(genre);
+        setSearchPage(1);
+        fetchSearchResults(genre);
+    };
+
     return (
         <div className="genre-list">
             <Search onSearch={handleSearch} />
             {searchResults ? (
                 <Genre 
-                    genre="Search Results" 
+                    genre={`${searchTerm} Movies`}
                     searchResults={searchResults} 
                     onLoadMore={loadMoreSearchResults}
                     isSearch={true}
+                    onGenreClick={handleGenreClick}
                 />
             ) : (
                 genres.map((genre) => (
-                    <Genre key={genre} genre={genre} />
+                    <Genre 
+                        key={genre} 
+                        genre={genre} 
+                        onGenreClick={handleGenreClick}
+                    />
                 ))
             )}
         </div>

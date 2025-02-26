@@ -103,7 +103,7 @@ const FilmPopup = ({ imdbID, onClose }) => {
                                 <svg viewBox="0 0 24 24" fill="currentColor" className="play-icon">
                                     <path d="M8 5v14l11-7z"/>
                                 </svg>
-                                Find Trailer
+                                Find Trailer (with sound)
                             </a>
                         </div>
                         <div className="popup-right">
