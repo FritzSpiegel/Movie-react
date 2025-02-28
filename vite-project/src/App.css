@@ -21,14 +21,36 @@ body {
 }
 
 .app-header {
-  padding: 20px 40px;
-  background: linear-gradient(to bottom, rgba(20, 20, 20, 0.95) 0%, rgba(20, 20, 20, 0.5) 100%);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  padding: 30px 40px;
+  background: linear-gradient(to bottom, rgba(20, 20, 20, 0.95), rgba(20, 20, 20, 0.9));
   z-index: 1000;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  transition: all 0.3s ease;
+}
+
+.app-header.scrolled {
+  padding: 15px 40px;
+  background: rgba(20, 20, 20, 0.98);
+}
+
+.logo {
+  position: absolute;
+  left: 40px;
+  transition: all 0.3s ease;
+}
+
+.scrolled .logo {
+  transform: scale(0.9);
 }
 
 .genre-list {
@@ -119,3 +141,19 @@ html {
 .read-the-docs {
     color: #888;
 } */
+
+/* Füge Padding zum main-Content hinzu, damit er unter dem fixed Header beginnt */
+main {
+  padding-top: 100px;
+}
+
+/* Anpassung der Suchleiste */
+.search-container {
+  flex: 0 1 600px;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.scrolled .search-container {
+  transform: scale(0.95);
+}

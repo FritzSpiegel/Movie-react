@@ -25,7 +25,7 @@
 .film {
     position: relative;
     cursor: pointer;
-    transition: all 0.5s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1;
     width: 170px;
     height: 270px;
@@ -234,6 +234,7 @@
     width: 480px;
     transform: scale(1.02);
     z-index: 10;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .film.showing-preview .preview-container {
@@ -248,7 +249,7 @@
     height: 100%;
     overflow: hidden;
     border-radius: 8px;
-    transition: all 0.5s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Video Styles */
@@ -258,7 +259,7 @@
     object-fit: cover;
     border-radius: 8px;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .showing-preview .preview-video {

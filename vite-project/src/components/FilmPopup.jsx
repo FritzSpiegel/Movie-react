@@ -2,10 +2,11 @@ import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from 'react-dom';
 import "./FilmPopup.css";
 
-const FilmPopup = ({ imdbID, onClose }) => {
+const FilmPopup = ({ imdbID, onClose, sourceRect }) => {
     const [film, setFilm] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [popupStyle, setPopupStyle] = useState({});
 
     // Cache für bereits geladene Filme
     const filmCache = React.useRef(new Map());
@@ -36,6 +37,16 @@ const FilmPopup = ({ imdbID, onClose }) => {
     useEffect(() => {
         fetchFilm();
     }, [fetchFilm]);
+
+    useEffect(() => {
+        if (sourceRect) {
+            // Berechne die initiale Position basierend auf dem Film-Cover
+            const initialStyle = {
+                transformOrigin: `${sourceRect.left + sourceRect.width/2}px ${sourceRect.top + sourceRect.height/2}px`
+            };
+            setPopupStyle(initialStyle);
+        }
+    }, [sourceRect]);
 
     const handleClose = (e) => {
         e?.stopPropagation();
@@ -73,12 +84,10 @@ const FilmPopup = ({ imdbID, onClose }) => {
     if (!film && !isLoading) return null;
 
     return ReactDOM.createPortal(
-        <div 
-            className={`popup-overlay ${isClosing ? 'closing' : ''}`} 
-            onClick={handleOverlayClick}
-        >
+        <div className={`popup-overlay ${isClosing ? 'closing' : ''}`}>
             <div 
                 className={`popup-content ${isClosing ? 'closing' : ''}`}
+                style={popupStyle}
                 onClick={e => e.stopPropagation()}
             >
                 <button className="close-btn" onClick={handleClose}>×</button>

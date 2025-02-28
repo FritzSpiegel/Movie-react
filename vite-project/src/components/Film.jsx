@@ -82,12 +82,17 @@ const Film = ({ title, image, imdbID, index }) => {
         };
     }, []);
 
+    const handleClick = () => {
+        const rect = filmRef.current.getBoundingClientRect();
+        setIsOpen(true);
+    };
+
     return (
         <>
             <div 
                 ref={filmRef}
                 className={`film ${showPreview ? 'showing-preview' : ''}`}
-                onClick={() => setIsOpen(true)}
+                onClick={handleClick}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 style={{ '--animation-order': index }}
@@ -116,7 +121,13 @@ const Film = ({ title, image, imdbID, index }) => {
                     <h3>{title}</h3>
                 </div>
             </div>
-            {isOpen && <FilmPopup imdbID={imdbID} onClose={() => setIsOpen(false)} />}
+            {isOpen && (
+                <FilmPopup 
+                    imdbID={imdbID} 
+                    onClose={() => setIsOpen(false)}
+                    sourceRect={filmRef.current.getBoundingClientRect()}
+                />
+            )}
         </>
     );
 };
