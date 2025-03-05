@@ -5,7 +5,12 @@ const Search = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        onSearch(searchTerm.trim());
+        const trimmedTerm = searchTerm.trim();
+        if (trimmedTerm) {
+            onSearch(trimmedTerm);
+        } else {
+            onSearch('');
+        }
     }, [searchTerm, onSearch]);
 
     return (

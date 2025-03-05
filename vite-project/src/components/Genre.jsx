@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import Film from "./Film";
 import "./Genre.css";
 import Search from "./Search";
@@ -47,12 +47,12 @@ const shuffleArray = (array) => {
 
 const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => {
     const containerRef = useRef(null);
-    const [films, setFilms] = useState([]);
-    const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [showLeftButton, setShowLeftButton] = useState(false);
-    const [showRightButton, setShowRightButton] = useState(true);
-    const [isHovered, setIsHovered] = useState(false);
+    const [movies, setMovies] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showLeft, setShowLeft] = useState(false);
+    const [showRight, setShowRight] = useState(true);
+    const [hovered, setHovered] = useState(false);
 
     const { ref, inView } = useInView({
         threshold: 0.5,
@@ -61,11 +61,11 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
 
     useEffect(() => {
         if (searchResults) {
-            setFilms(searchResults);
+            setMovies(searchResults);
         } else {
-            fetchMoviesForGenre(genre, page);
+            fetchMovies(genre, currentPage);
         }
-    }, [genre, page, searchResults]);
+    }, [genre, currentPage, searchResults]);
 
     useEffect(() => {
         if (inView && isSearch && onLoadMore) {
@@ -73,14 +73,14 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
         }
     }, [inView, isSearch, onLoadMore]);
 
-    const handleScroll = (e) => {
+    const handleScroll = useCallback((e) => {
         const container = e.target;
-        setShowLeftButton(container.scrollLeft > 0);
+        setShowLeft(container.scrollLeft > 0);
         
         // Prüfe, ob wir am Ende angekommen sind
-        const isAtEnd = Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth;
-        setShowRightButton(!isAtEnd);
-    };
+        const atEnd = Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth;
+        setShowRight(!atEnd);
+    }, []);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -88,17 +88,17 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
             container.addEventListener('scroll', handleScroll);
             return () => container.removeEventListener('scroll', handleScroll);
         }
-    }, []);
+    }, [handleScroll]);
 
-    const fetchMoviesForGenre = async (genre, currentPage) => {
-        setLoading(true);
+    const fetchMovies = useCallback(async (genre, page) => {
+        setIsLoading(true);
         const apiKey = "5206816f";
         try {
             // Reduziere die Anzahl der gleichzeitigen Anfragen von 5 auf 2
             const fetchPromises = [];
-            for (let page = currentPage; page < currentPage + 2; page++) {
+            for (let p = page; p < page + 2; p++) {
                 fetchPromises.push(
-                    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${genre}&type=movie&page=${page}`)
+                    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${genre}&type=movie&page=${p}`)
                         .then(response => response.json())
                 );
             }
@@ -108,19 +108,19 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                 .filter(data => data.Search)
                 .flatMap(data => data.Search);
 
-            setFilms(prevFilms => {
-                const uniqueNewFilms = newMovies.filter(newFilm => 
-                    !prevFilms.some(existingFilm => existingFilm.imdbID === newFilm.imdbID)
+            setMovies(prevMovies => {
+                const uniqueMovies = newMovies.filter(newMovie => 
+                    !prevMovies.some(existingMovie => existingMovie.imdbID === newMovie.imdbID)
                 );
-                return [...prevFilms, ...uniqueNewFilms];
+                return [...prevMovies, ...uniqueMovies];
             });
         } catch (error) {
             console.error("Error fetching movies:", error);
         }
-        setLoading(false);
-    };
+        setIsLoading(false);
+    }, []);
 
-    const scroll = (direction) => {
+    const scrollMovies = (direction) => {
         if (containerRef.current && !isSearch) {
             const container = containerRef.current;
             const scrollAmount = container.clientWidth * 0.8;
@@ -135,7 +135,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                 const maxScroll = container.scrollWidth - container.clientWidth;
                 const newScrollPosition = container.scrollLeft + scrollAmount;
                 if (newScrollPosition >= maxScroll - container.clientWidth) {
-                    setPage(prevPage => prevPage + 1);
+                    setCurrentPage(prevPage => prevPage + 1);
                 }
             }
         }
@@ -146,7 +146,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
             <h2 onClick={() => onGenreClick(genre)}>{genre}</h2>
             {isSearch ? (
                 <div className="search-results-grid">
-                    {films.map((film, index) => (
+                    {movies.map((film, index) => (
                         <Film 
                             key={film.imdbID} 
                             title={film.Title} 
@@ -155,19 +155,19 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                             index={index} 
                         />
                     ))}
-                    {loading && <div className="loading-spinner">Loading...</div>}
+                    {isLoading && <div className="loading-spinner">Loading...</div>}
                     <div ref={ref} style={{ height: '20px', width: '100%' }} />
                 </div>
             ) : (
                 <div 
                     className="film-wrapper"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
                 >
                     <button 
                         className="scroll-button left" 
-                        onClick={() => scroll('left')}
-                        style={{ opacity: showLeftButton && isHovered ? 1 : 0 }}
+                        onClick={() => scrollMovies('left')}
+                        style={{ opacity: showLeft && hovered ? 1 : 0 }}
                     >
                         ❮
                     </button>
@@ -176,7 +176,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                         ref={containerRef}
                         onScroll={handleScroll}
                     >
-                        {films.map((film, index) => (
+                        {movies.map((film, index) => (
                             <Film 
                                 key={film.imdbID} 
                                 title={film.Title} 
@@ -185,12 +185,12 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                                 index={index} 
                             />
                         ))}
-                        {loading && <div className="loading-spinner">Loading...</div>}
+                        {isLoading && <div className="loading-spinner">Loading...</div>}
                     </div>
                     <button 
                         className="scroll-button right" 
-                        onClick={() => scroll('right')}
-                        style={{ opacity: showRightButton && isHovered ? 1 : 0 }}
+                        onClick={() => scrollMovies('right')}
+                        style={{ opacity: showRight && hovered ? 1 : 0 }}
                     >
                         ❯
                     </button>

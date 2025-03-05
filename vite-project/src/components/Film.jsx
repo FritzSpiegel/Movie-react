@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import FilmPopup from "./FilmPopup";
 import "./Film.css";
 
@@ -19,7 +19,7 @@ const Film = ({ title, image, imdbID, index }) => {
         filmRef.current.classList.add(isInLeftHalf ? 'align-left' : 'align-right');
     };
 
-    const handleMouseEnter = async () => {
+    const handleMouseEnter = useCallback(async () => {
         updateTransformOrigin();
         hoverTimerRef.current = setTimeout(async () => {
             try {
@@ -60,10 +60,10 @@ const Film = ({ title, image, imdbID, index }) => {
             } finally {
                 setIsLoading(false);
             }
-        }, 3000);
-    };
+        }, 4000);
+    }, [title]);
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
         if (hoverTimerRef.current) {
             clearTimeout(hoverTimerRef.current);
             hoverTimerRef.current = null;
@@ -72,7 +72,7 @@ const Film = ({ title, image, imdbID, index }) => {
         setTimeout(() => {
             setPreviewVideo(null);
         }, 300);
-    };
+    }, []);
 
     useEffect(() => {
         return () => {

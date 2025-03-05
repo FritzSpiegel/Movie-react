@@ -10,7 +10,7 @@
     justify-content: center;
     z-index: 9999;
     backdrop-filter: blur(0px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
     opacity: 0;
 }
 
@@ -33,7 +33,7 @@
     gap: 30px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transform-origin: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s ease, opacity 0.3s ease;
     transform: scale(0.3) translateY(100px);
     opacity: 0;
 }

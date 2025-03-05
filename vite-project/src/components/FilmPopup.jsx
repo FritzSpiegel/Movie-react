@@ -12,7 +12,6 @@ const FilmPopup = ({ imdbID, onClose, sourceRect }) => {
     const filmCache = React.useRef(new Map());
 
     const fetchFilm = useCallback(async () => {
-        // Prüfe Cache
         if (filmCache.current.has(imdbID)) {
             setFilm(filmCache.current.get(imdbID));
             setIsLoading(false);
@@ -20,11 +19,9 @@ const FilmPopup = ({ imdbID, onClose, sourceRect }) => {
         }
 
         try {
-            const response = await fetch(
-                `http://www.omdbapi.com/?apikey=5206816f&i=${imdbID}`
-            );
+            const response = await fetch(`http://www.omdbapi.com/?apikey=5206816f&i=${imdbID}`);
+            if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
-            // Speichere im Cache
             filmCache.current.set(imdbID, data);
             setFilm(data);
         } catch (error) {
