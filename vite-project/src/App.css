@@ -20,6 +20,11 @@ body {
   width: 100%;
 }
 
+.app.light {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  color: black;
+}
+
 .app-header {
   position: fixed;
   top: 0;
@@ -33,7 +38,7 @@ body {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 40px;
   transition: all 0.3s ease;
 }
@@ -41,6 +46,17 @@ body {
 .app-header.scrolled {
   padding: 15px 40px;
   background: rgba(20, 20, 20, 0.98);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+.app-header.light {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+}
+
+.app-header.light.scrolled {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
 }
 
 .logo {
@@ -149,7 +165,9 @@ main {
 
 /* Anpassung der Suchleiste */
 .search-container {
-  flex: 0 1 600px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
   padding: 0;
   transition: all 0.3s ease;
 }
@@ -157,3 +175,46 @@ main {
 .scrolled .search-container {
   transform: scale(0.95);
 }
+
+.search-input {
+  max-width: 600px;
+  width: 100%;
+}
+
+.theme-toggle {
+  margin-left: auto;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #E50914;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #ff0f1f;
+}
+
+/* Popup styles */
+.popup-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.popup-content {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  color: black;
+}
+
+/* Add styles for dark mode */
+.app-header.dark {
+  background: rgba(20, 20, 20, 0.95);
+  color: white;
+}
+
+.popup-content.dark {
+  background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+  color: white;
+}
+
+/* Add more styles for light mode as needed */

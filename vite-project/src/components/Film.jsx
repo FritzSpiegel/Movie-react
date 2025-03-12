@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import FilmPopup from "./FilmPopup";
 import "./Film.css";
 
-const Film = ({ title, image, imdbID, index }) => {
+const Film = ({ title, image, imdbID, index, isDarkMode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [previewVideo, setPreviewVideo] = useState(null);
@@ -83,7 +83,6 @@ const Film = ({ title, image, imdbID, index }) => {
     }, []);
 
     const handleClick = () => {
-        const rect = filmRef.current.getBoundingClientRect();
         setIsOpen(true);
     };
 
@@ -126,6 +125,7 @@ const Film = ({ title, image, imdbID, index }) => {
                     imdbID={imdbID} 
                     onClose={() => setIsOpen(false)}
                     sourceRect={filmRef.current.getBoundingClientRect()}
+                    isDarkMode={isDarkMode}
                 />
             )}
         </>

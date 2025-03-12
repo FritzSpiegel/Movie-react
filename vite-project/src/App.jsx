@@ -8,6 +8,10 @@ const App = () => {
   const [key, setKey] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [term, setTerm] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Check localStorage for theme preference
+    return localStorage.getItem('theme') === 'dark';
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,11 +28,22 @@ const App = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  const toggleTheme = () => {
+    setIsDarkMode(prevMode => {
+      const newMode = !prevMode;
+      localStorage.setItem('theme', newMode ? 'dark' : 'light'); // Save preference
+      return newMode;
+    });
+  };
+
   return (
-    <div className="app">
-      <header className={`app-header ${scrolled ? 'scrolled' : ''}`}>
+    <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
+      <header className={`app-header ${scrolled ? 'scrolled' : ''} ${isDarkMode ? 'dark' : 'light'}`}>
         <Logo onClick={resetScroll} />
         <Search onSearch={setTerm} />
+        <button onClick={toggleTheme} className="theme-toggle">
+          {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+        </button>
       </header>
       <main>
         <GenreList key={key} initialSearchTerm={term} />

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from 'react-dom';
 import "./FilmPopup.css";
 
-const FilmPopup = ({ imdbID, onClose, sourceRect }) => {
+const FilmPopup = ({ imdbID, onClose, sourceRect, isDarkMode }) => {
     const [film, setFilm] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +20,9 @@ const FilmPopup = ({ imdbID, onClose, sourceRect }) => {
 
         try {
             const response = await fetch(`http://www.omdbapi.com/?apikey=5206816f&i=${imdbID}`);
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             filmCache.current.set(imdbID, data);
             setFilm(data);
@@ -83,7 +85,7 @@ const FilmPopup = ({ imdbID, onClose, sourceRect }) => {
     return ReactDOM.createPortal(
         <div className={`popup-overlay ${isClosing ? 'closing' : ''}`}>
             <div 
-                className={`popup-content ${isClosing ? 'closing' : ''}`}
+                className={`popup-content ${isClosing ? 'closing' : ''} ${isDarkMode ? 'dark' : ''}`}
                 style={popupStyle}
                 onClick={e => e.stopPropagation()}
             >
