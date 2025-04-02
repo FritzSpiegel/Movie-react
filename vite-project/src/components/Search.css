@@ -5,7 +5,7 @@
 }
 
 .search-container form {
-    max-width: 700px;
+    max-width: 1200px;
     margin: 0 auto;
     display: flex;
     gap: 15px;
@@ -14,7 +14,7 @@
 
 .search-input {
     width: 100%;
-    max-width: 700px;
+    max-width: 1200px;
     margin: 0 auto;
     display: block;
     padding: 15px 25px;
@@ -24,14 +24,12 @@
     color: white;
     font-size: 16px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .search-input:focus {
     outline: none;
     border-color: #E50914;
     background: rgba(0,0,0,0.6);
-    box-shadow: 0 4px 20px rgba(229, 9, 20, 0.3);
 }
 
 .search-input::placeholder {
@@ -50,12 +48,10 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
 }
 
 .search-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(229, 9, 20, 0.5);
 }
 
 .search-button svg {

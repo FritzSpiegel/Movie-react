@@ -32,6 +32,13 @@ const App = () => {
     setIsDarkMode(prevMode => {
       const newMode = !prevMode;
       localStorage.setItem('theme', newMode ? 'dark' : 'light'); // Save preference
+      
+      // Löse ein benutzerdefiniertes Event aus, um andere Komponenten zu benachrichtigen
+      const event = new CustomEvent('themechange', { 
+        detail: { darkMode: newMode } 
+      });
+      window.dispatchEvent(event);
+      
       return newMode;
     });
   };
@@ -42,11 +49,11 @@ const App = () => {
         <Logo onClick={resetScroll} />
         <Search onSearch={setTerm} />
         <button onClick={toggleTheme} className="theme-toggle">
-          {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          {isDarkMode ? 'White Mode' : 'Dark Mode'}
         </button>
       </header>
       <main>
-        <GenreList key={key} initialSearchTerm={term} />
+        <GenreList key={key} initialSearchTerm={term} currentTheme={isDarkMode ? 'dark' : 'light'} />
       </main>
     </div>
   );

@@ -2,14 +2,58 @@ import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from 'react-dom';
 import "./FilmPopup.css";
 
-const FilmPopup = ({ imdbID, onClose, sourceRect, isDarkMode }) => {
+const FilmPopup = ({ imdbID, onClose, sourceRect, isDarkMode: propIsDarkMode }) => {
     const [film, setFilm] = useState(null);
     const [isClosing, setIsClosing] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [popupStyle, setPopupStyle] = useState({});
+    // Verwende propIsDarkMode als Anfangswert, aber überwache auch localStorage-Änderungen
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        // Wenn die Prop definiert ist, verwende diese, ansonsten prüfe localStorage
+        return propIsDarkMode !== undefined 
+            ? propIsDarkMode 
+            : localStorage.getItem('theme') === 'dark';
+    });
 
     // Cache für bereits geladene Filme
     const filmCache = React.useRef(new Map());
+
+    // Überwache localStorage-Änderungen und Theme-Toggle
+    useEffect(() => {
+        // Aktualisiere Zustand, wenn sich propIsDarkMode ändert
+        if (propIsDarkMode !== undefined) {
+            setIsDarkMode(propIsDarkMode);
+        }
+        
+        // Event-Listener für localStorage-Änderungen
+        const handleStorageChange = (e) => {
+            if (e.key === 'theme') {
+                setIsDarkMode(e.newValue === 'dark');
+            }
+        };
+        
+        // Event-Listener für benutzerdefinierten Event, falls Theme über den Toggle geändert wird
+        const handleThemeChange = (e) => {
+            setIsDarkMode(localStorage.getItem('theme') === 'dark');
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('themechange', handleThemeChange);
+        
+        // Regelmäßige Überprüfung des Theme-Status aus localStorage
+        const checkThemeInterval = setInterval(() => {
+            const currentTheme = localStorage.getItem('theme') === 'dark';
+            if (currentTheme !== isDarkMode) {
+                setIsDarkMode(currentTheme);
+            }
+        }, 100);
+        
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('themechange', handleThemeChange);
+            clearInterval(checkThemeInterval);
+        };
+    }, [propIsDarkMode, isDarkMode]);
 
     const fetchFilm = useCallback(async () => {
         if (filmCache.current.has(imdbID)) {
@@ -80,13 +124,31 @@ const FilmPopup = ({ imdbID, onClose, sourceRect, isDarkMode }) => {
         };
     }, []);
 
+    // Für Debugging: log theme state
+    useEffect(() => {
+        console.log("Current theme in popup:", isDarkMode ? "dark" : "light");
+    }, [isDarkMode]);
+
     if (!film && !isLoading) return null;
 
+    // Definiere Popup Content Style basierend auf isDarkMode
+    const popupContentStyle = {
+        ...popupStyle,
+        background: isDarkMode 
+            ? 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)' 
+            : 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)',
+        color: isDarkMode ? 'white' : '#333',
+        borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+    };
+
     return ReactDOM.createPortal(
-        <div className={`popup-overlay ${isClosing ? 'closing' : ''}`}>
+        <div 
+            className={`popup-overlay ${isClosing ? 'closing' : ''}`} 
+            onClick={handleOverlayClick}
+        >
             <div 
-                className={`popup-content ${isClosing ? 'closing' : ''} ${isDarkMode ? 'dark' : ''}`}
-                style={popupStyle}
+                className={`popup-content ${isClosing ? 'closing' : ''}`}
+                style={popupContentStyle}
                 onClick={e => e.stopPropagation()}
             >
                 <button className="close-btn" onClick={handleClose}>×</button>

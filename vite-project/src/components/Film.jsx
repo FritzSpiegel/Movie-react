@@ -2,25 +2,57 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import FilmPopup from "./FilmPopup";
 import "./Film.css";
 
-const Film = ({ title, image, imdbID, index, isDarkMode }) => {
+const Film = ({ title, image, imdbID, index, isDarkMode: propIsDarkMode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [previewVideo, setPreviewVideo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const filmRef = useRef(null);
     const hoverTimerRef = useRef(null);
-
-    const updateTransformOrigin = () => {
-        if (!filmRef.current) return;
-        const rect = filmRef.current.getBoundingClientRect();
-        const isInLeftHalf = rect.left < window.innerWidth / 2;
+    
+    // Eigenen isDarkMode-Status verwalten, der auf propIsDarkMode basiert,
+    // aber auch direkt aus localStorage aktualisiert werden kann
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        return propIsDarkMode !== undefined 
+            ? propIsDarkMode 
+            : localStorage.getItem('theme') === 'dark';
+    });
+    
+    // Aktualisiere den lokalen isDarkMode-Status, wenn sich propIsDarkMode ändert
+    useEffect(() => {
+        if (propIsDarkMode !== undefined) {
+            setIsDarkMode(propIsDarkMode);
+        }
+    }, [propIsDarkMode]);
+    
+    // Themeänderungen überwachen
+    useEffect(() => {
+        const updateTheme = () => {
+            const currentTheme = localStorage.getItem('theme') === 'dark';
+            if (propIsDarkMode === undefined) {
+                setIsDarkMode(currentTheme);
+            }
+        };
         
-        filmRef.current.classList.remove('align-left', 'align-right');
-        filmRef.current.classList.add(isInLeftHalf ? 'align-left' : 'align-right');
-    };
+        window.addEventListener('storage', updateTheme);
+        window.addEventListener('themechange', updateTheme);
+        
+        // Regelmäßige Überprüfung, falls andere Mechanismen fehlschlagen
+        const checkThemeInterval = setInterval(() => {
+            const currentTheme = localStorage.getItem('theme') === 'dark';
+            if (propIsDarkMode === undefined && currentTheme !== isDarkMode) {
+                setIsDarkMode(currentTheme);
+            }
+        }, 100);
+        
+        return () => {
+            window.removeEventListener('storage', updateTheme);
+            window.removeEventListener('themechange', updateTheme);
+            clearInterval(checkThemeInterval);
+        };
+    }, [propIsDarkMode, isDarkMode]);
 
     const handleMouseEnter = useCallback(async () => {
-        updateTransformOrigin();
         hoverTimerRef.current = setTimeout(async () => {
             try {
                 setIsLoading(true);

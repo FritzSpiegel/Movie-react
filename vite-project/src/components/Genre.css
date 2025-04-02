@@ -1,7 +1,6 @@
 .genre {
     padding: 20px 40px;
     width: 100%;
-    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -17,22 +16,7 @@
 }
 
 .genre h2::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(229, 9, 20, 0.1);
-    border-radius: 8px;
-    transform: scale(0.8);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.genre h2:hover::before {
-    transform: scale(1);
-    opacity: 1;
+    content: none;
 }
 
 .genre h2::after {
@@ -91,13 +75,9 @@
 .film-container .film {
     flex: 0 0 calc((100% - 140px) / 8);
     height: 300px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    opacity: 1;
-    transition: transform 0.3s ease;
 }
 
+/* Scroll Buttons */
 .scroll-button {
     background: rgba(0, 0, 0, 0.7);
     color: #E50914;
@@ -117,14 +97,12 @@
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(8px);
-    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.2);
 }
 
 .scroll-button:hover {
     background: #E50914;
     color: white;
     transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
     border-color: transparent;
 }
 
@@ -136,17 +114,7 @@
     right: 10px;
 }
 
-/* Optional: Füge einen subtilen Glüh-Effekt hinzu */
-@keyframes buttonGlow {
-    0% { box-shadow: 0 4px 12px rgba(229, 9, 20, 0.2); }
-    50% { box-shadow: 0 4px 18px rgba(229, 9, 20, 0.4); }
-    100% { box-shadow: 0 4px 12px rgba(229, 9, 20, 0.2); }
-}
-
-.scroll-button:hover {
-    animation: buttonGlow 2s infinite;
-}
-
+/* Loading Animation */
 .loading-spinner {
     display: flex;
     align-items: center;
@@ -164,35 +132,22 @@
     100% { opacity: 0.5; }
 }
 
-/* Add these new styles for the search results grid */
+/* Search Results Grid */
 .search-results-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 25px;
     padding: 20px 40px;
-    max-width: 100%;
 }
 
 .search-results-grid .film {
     height: 300px;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     opacity: 0;
     animation: fadeInScale 0.5s ease forwards;
     animation-delay: calc(var(--animation-order) * 0.1s);
-}
-
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.6) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
 }
 
 .search-results-grid .film:hover {
@@ -200,28 +155,14 @@
     z-index: 2;
 }
 
+/* Verhindern von Schatten */
 .film-container::before,
 .film-container::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 60px;
-    z-index: 2;
-    pointer-events: none;
+    content: none !important;
+    display: none !important;
 }
 
-.film-container::before {
-    left: 0;
-    background: linear-gradient(to right, #141414, transparent);
-}
-
-.film-container::after {
-    right: 0;
-    background: linear-gradient(to left, #141414, transparent);
-}
-
-/* Verbesserte Responsive-Anpassungen */
+/* Responsive Anpassungen */
 @media (max-width: 1600px) {
     .film-container .film {
         flex: 0 0 calc((100% - 120px) / 7);

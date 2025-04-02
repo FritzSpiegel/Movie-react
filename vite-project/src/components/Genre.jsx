@@ -53,6 +53,9 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
     const [showLeft, setShowLeft] = useState(false);
     const [showRight, setShowRight] = useState(true);
     const [hovered, setHovered] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        return localStorage.getItem('theme') === 'dark';
+    });
 
     const { ref, inView } = useInView({
         threshold: 0.5,
@@ -72,6 +75,29 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
             onLoadMore();
         }
     }, [inView, isSearch, onLoadMore]);
+
+    // Verbesserte Theme-Überwachung
+    useEffect(() => {
+        const updateTheme = () => {
+            const currentTheme = localStorage.getItem('theme') === 'dark';
+            setIsDarkMode(currentTheme);
+        };
+
+        // Aktualisiere den Zustand bei Änderungen im localStorage
+        window.addEventListener('storage', updateTheme);
+        
+        // Höre auf das benutzerdefinierte Event vom App-Komponenten
+        window.addEventListener('themechange', updateTheme);
+        
+        // Regelmäßige Überprüfung des Theme-Status
+        const checkThemeInterval = setInterval(updateTheme, 100);
+
+        return () => {
+            window.removeEventListener('storage', updateTheme);
+            window.removeEventListener('themechange', updateTheme);
+            clearInterval(checkThemeInterval);
+        };
+    }, []);
 
     const handleScroll = useCallback((e) => {
         const container = e.target;
@@ -94,26 +120,20 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
         setIsLoading(true);
         const apiKey = "5206816f";
         try {
-            // Reduziere die Anzahl der gleichzeitigen Anfragen von 5 auf 2
-            const fetchPromises = [];
-            for (let p = page; p < page + 2; p++) {
-                fetchPromises.push(
-                    fetch(`http://www.omdbapi.com/?apikey=${apiKey}&s=${genre}&type=movie&page=${p}`)
-                        .then(response => response.json())
-                );
+            // Reduziere auf nur eine Anfrage pro Fetch
+            const response = await fetch(
+                `http://www.omdbapi.com/?apikey=${apiKey}&s=${genre}&type=movie&page=${page}`
+            );
+            const data = await response.json();
+
+            if (data.Search) {
+                setMovies(prevMovies => {
+                    const uniqueMovies = data.Search.filter(newMovie => 
+                        !prevMovies.some(existingMovie => existingMovie.imdbID === newMovie.imdbID)
+                    );
+                    return [...prevMovies, ...uniqueMovies];
+                });
             }
-
-            const results = await Promise.all(fetchPromises);
-            const newMovies = results
-                .filter(data => data.Search)
-                .flatMap(data => data.Search);
-
-            setMovies(prevMovies => {
-                const uniqueMovies = newMovies.filter(newMovie => 
-                    !prevMovies.some(existingMovie => existingMovie.imdbID === newMovie.imdbID)
-                );
-                return [...prevMovies, ...uniqueMovies];
-            });
         } catch (error) {
             console.error("Error fetching movies:", error);
         }
@@ -141,6 +161,11 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
         }
     };
 
+    // Debug-Log für den Theme-Status
+    useEffect(() => {
+        console.log(`Genre component ${genre} theme: ${isDarkMode ? 'dark' : 'light'}`);
+    }, [isDarkMode, genre]);
+
     return (
         <div className="genre">
             <h2 onClick={() => onGenreClick(genre)}>{genre}</h2>
@@ -153,6 +178,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                             image={film.Poster !== "N/A" ? film.Poster : null} 
                             imdbID={film.imdbID}
                             index={index} 
+                            isDarkMode={isDarkMode}
                         />
                     ))}
                     {isLoading && <div className="loading-spinner">Loading...</div>}
@@ -183,6 +209,7 @@ const Genre = ({ genre, searchResults, onLoadMore, isSearch, onGenreClick }) => 
                                 image={film.Poster !== "N/A" ? film.Poster : null} 
                                 imdbID={film.imdbID}
                                 index={index} 
+                                isDarkMode={isDarkMode}
                             />
                         ))}
                         {isLoading && <div className="loading-spinner">Loading...</div>}
@@ -215,24 +242,62 @@ const testGenreAvailability = async (genre) => {
     }
 };
 
-const GenreList = ({ initialSearchTerm }) => {
+// Statt fester initialGenres verwenden wir eine zufällige Auswahl
+const getRandomGenres = () => {
+    const shuffled = shuffleArray([...allGenres]);
+    return shuffled.slice(0, 3); // Nimm die ersten 3 zufälligen Genres
+};
+
+// Ersetze die feste initialGenres-Definition
+const initialGenres = getRandomGenres();
+
+const GenreList = ({ initialSearchTerm, currentTheme }) => {
     const [searchResults, setSearchResults] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchPage, setSearchPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [totalResults, setTotalResults] = useState(0);
     const [validatedGenres, setValidatedGenres] = useState([]);
-    const [visibleGenres, setVisibleGenres] = useState([]);
+    const [visibleGenres, setVisibleGenres] = useState(initialGenres);
     
     // Ref für Intersection Observer
     const loadMoreRef = useRef(null);
 
-    // Initial Genre-Validierung
+    // Theme-Status synchronisieren
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        return localStorage.getItem('theme') === 'dark';
+    });
+
+    // Theme-Änderungen überwachen
+    useEffect(() => {
+        if (currentTheme) {
+            setIsDarkMode(currentTheme === 'dark');
+        }
+        
+        const updateTheme = () => {
+            setIsDarkMode(localStorage.getItem('theme') === 'dark');
+        };
+        
+        window.addEventListener('storage', updateTheme);
+        window.addEventListener('themechange', updateTheme);
+        
+        return () => {
+            window.removeEventListener('storage', updateTheme);
+            window.removeEventListener('themechange', updateTheme);
+        };
+    }, [currentTheme]);
+
+    // Debug-Log
+    useEffect(() => {
+        console.log(`GenreList theme: ${isDarkMode ? 'dark' : 'light'}`);
+    }, [isDarkMode]);
+
+    // Modifiziere die useEffect für die initiale Genre-Validierung
     useEffect(() => {
         const validateGenres = async () => {
+            // Lade nur die initialGenres
             const validGenres = [];
-            for (const genre of shuffleArray([...allGenres])) {
-                if (validGenres.length >= 8) break; // Stoppe nach 8 validierten Genres
+            for (const genre of initialGenres) {
                 const isValid = await testGenreAvailability(genre);
                 if (isValid) {
                     validGenres.push(genre);
@@ -245,30 +310,47 @@ const GenreList = ({ initialSearchTerm }) => {
         validateGenres();
     }, []);
 
-    // Modifizierter Intersection Observer
+    // Modifiziere die fetchMovies Funktion im Genre-Component
+    const fetchMovies = useCallback(async (genre, page) => {
+        setIsLoading(true);
+        const apiKey = "5206816f";
+        try {
+            // Reduziere auf nur eine Anfrage pro Fetch
+            const response = await fetch(
+                `http://www.omdbapi.com/?apikey=${apiKey}&s=${genre}&type=movie&page=${page}`
+            );
+            const data = await response.json();
+
+            if (data.Search) {
+                setMovies(prevMovies => {
+                    const uniqueMovies = data.Search.filter(newMovie => 
+                        !prevMovies.some(existingMovie => existingMovie.imdbID === newMovie.imdbID)
+                    );
+                    return [...prevMovies, ...uniqueMovies];
+                });
+            }
+        } catch (error) {
+            console.error("Error fetching movies:", error);
+        }
+        setIsLoading(false);
+    }, []);
+
+    // Modifiziere den Intersection Observer für das Nachladen
     useEffect(() => {
         const observer = new IntersectionObserver(
             async (entries) => {
-                if (entries[0].isIntersecting && !searchResults) {
-                    const currentLength = visibleGenres.length;
-                    if (currentLength < allGenres.length) {
-                        const remainingGenres = allGenres.filter(
-                            genre => !visibleGenres.includes(genre) && !validatedGenres.includes(genre)
-                        );
-                        
-                        // Teste die nächsten Genres
-                        const newValidGenres = [];
-                        for (const genre of shuffleArray(remainingGenres)) {
-                            if (newValidGenres.length >= 4) break;
-                            const isValid = await testGenreAvailability(genre);
-                            if (isValid) {
-                                newValidGenres.push(genre);
-                            }
-                        }
-                        
-                        if (newValidGenres.length > 0) {
-                            setValidatedGenres(prev => [...prev, ...newValidGenres]);
-                            setVisibleGenres(prev => [...prev, ...newValidGenres]);
+                if (entries[0].isIntersecting && !searchResults && validatedGenres.length < 25) {
+                    const remainingGenres = allGenres.filter(
+                        genre => !visibleGenres.includes(genre) && !validatedGenres.includes(genre)
+                    );
+                    
+                    // Teste nur ein Genre auf einmal
+                    for (const genre of shuffleArray(remainingGenres)) {
+                        const isValid = await testGenreAvailability(genre);
+                        if (isValid) {
+                            setValidatedGenres(prev => [...prev, genre]);
+                            setVisibleGenres(prev => [...prev, genre]);
+                            break; // Beende nach einem erfolgreichen Genre
                         }
                     }
                 }
@@ -365,6 +447,18 @@ const GenreList = ({ initialSearchTerm }) => {
         }
     };
 
+    // Optional: Lade mehr Genres erst wenn der Benutzer scrollt
+    const loadMoreGenres = useCallback(() => {
+        const additionalGenres = [
+            "Adventure",
+            "Animation",
+            "Crime",
+            "Documentary",
+            "Family"
+        ];
+        setVisibleGenres(prev => [...prev, ...additionalGenres]);
+    }, []);
+
     return (
         <div className="genre-list">
             {searchResults ? (
@@ -374,6 +468,7 @@ const GenreList = ({ initialSearchTerm }) => {
                     onLoadMore={loadMoreSearchResults}
                     isSearch={true}
                     onGenreClick={handleGenreClick}
+                    isDarkMode={isDarkMode}
                 />
             ) : (
                 <>
@@ -382,6 +477,7 @@ const GenreList = ({ initialSearchTerm }) => {
                             key={genre} 
                             genre={genre} 
                             onGenreClick={handleGenreClick}
+                            isDarkMode={isDarkMode}
                         />
                     ))}
                     <div ref={loadMoreRef} style={{ height: '20px', width: '100%' }} />
